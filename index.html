@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Physics Simulation Hub</title>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="#">Physics Sims</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav">
+                    <li class="nav-item">
+                        <a class="nav-link active" href="#" data-sim="vector-lab">Vector Lab</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#" data-sim="skate-park">Skate Park</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#" data-sim="projectile-motion">Projectile Motion</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <main class="container mt-4">
+        <!-- Vector Lab Simulator -->
+        <div id="vector-lab-container" class="sim-container">
+            <h2 class="mb-3">Vector Lab: Drag & Drop</h2>
+            <div class="row">
+                <div class="col-md-9" id="vector-lab-canvas"></div>
+                <div class="col-md-3">
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title">Controls</h5>
+                            <div class="form-check mb-2">
+                                <input class="form-check-input" type="checkbox" id="show-sum">
+                                <label class="form-check-label" for="show-sum">Show Sum (A + B)</label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="show-components">
+                                <label class="form-check-label" for="show-components">Show Components</label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card mt-3">
+                        <div class="card-body">
+                            <h5 class="card-title">Data Panel</h5>
+                            <p class="mb-1"><strong>Vector A:</strong> <span id="vector-a-data"></span></p>
+                            <p class="mb-1"><strong>Vector B:</strong> <span id="vector-b-data"></span></p>
+                            <p class="mb-1"><strong>A + B:</strong> <span id="vector-sum-data"></span></p>
+                            <p class="mb-1"><strong>Scalar Product (A · B):</strong> <span id="scalar-product-data"></span></p>
+                            <p><strong>Vector Product (A x B):</strong> <span id="vector-product-data"></span></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Skate Park Simulator (Hidden by default) -->
+        <div id="skate-park-container" class="sim-container" style="display: none;">
+            <h2 class="mb-3">Skate Park: Energy Conservation</h2>
+            <div class="row">
+                <div class="col-md-9" id="skate-park-canvas"></div>
+                <div class="col-md-3">
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title">Controls</h5>
+                            <div class="mb-3">
+                                <label for="mass-slider" class="form-label">Mass (m)</label>
+                                <input type="range" class="form-range" min="10" max="100" value="50" id="mass-slider">
+                            </div>
+                            <div class="mb-3">
+                                <label for="gravity-slider" class="form-label">Gravity (g)</label>
+                                <input type="range" class="form-range" min="1" max="25" value="9.8" step="0.1" id="gravity-slider">
+                            </div>
+                            <div class="mb-3">
+                                <label for="friction-slider" class="form-label">Friction (f)</label>
+                                <input type="range" class="form-range" min="0" max="0.1" value="0" step="0.001" id="friction-slider">
+                            </div>
+                            <button id="reset-skater-btn" class="btn btn-primary">Reset Skater</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Projectile Motion Simulator (Hidden by default) -->
+        <div id="projectile-motion-container" class="sim-container" style="display: none;">
+            <h2 class="mb-3">Projectile Motion Simulator</h2>
+            <div class="row">
+                <div class="col-md-9" id="projectile-motion-canvas"></div>
+                <div class="col-md-3">
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title">Controls</h5>
+                            <div class="mb-3">
+                                <label for="proj-gravity-slider" class="form-label">Gravity (g)</label>
+                                <input type="range" class="form-range" min="1" max="25" value="9.8" step="0.1" id="proj-gravity-slider">
+                            </div>
+                            <div class="mb-3">
+                                <label for="proj-mass-slider" class="form-label">Mass (m)</label>
+                                <input type="range" class="form-range" min="1" max="200" value="50" id="proj-mass-slider">
+                            </div>
+                            <div class="mb-3">
+                                <label for="air-resistance-slider" class="form-label">Air Resistance (b)</label>
+                                <input type="range" class="form-range" min="0" max="1" value="0" step="0.01" id="air-resistance-slider">
+                            </div>
+                            <div class="form-check mb-2">
+                                <input class="form-check-input" type="checkbox" id="trace-path-checkbox" checked>
+                                <label class="form-check-label" for="trace-path-checkbox">Trace Path</label>
+                            </div>
+                            <div class="form-check mb-3">
+                                <input class="form-check-input" type="checkbox" id="show-vectors-checkbox">
+                                <label class="form-check-label" for="show-vectors-checkbox">Show Vectors</label>
+                            </div>
+                            <button id="clear-traces-btn" class="btn btn-secondary">Clear Traces</button>
+                        </div>
+                    </div>
+                     <div class="card mt-3">
+                        <div class="card-body">
+                            <h5 class="card-title">Shot Data</h5>
+                            <p class="mb-1"><strong>Max Range (R):</strong> <span id="max-range-data">0</span> m</p>
+                            <p><strong>Max Height (H):</strong> <span id="max-height-data">0</span> m</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script type="module" src="/main.js"></script>
+</body>
+</html>

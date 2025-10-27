@@ -13,6 +13,14 @@ const projectileMotionSketch = (p) => {
         massSlider, diameterSlider;
     let fireBtn, resetBtn;
 
+    // --- Projectile Data ---
+    const PROJECTILES = {
+        cannonball: { mass: 50, diameter: 0.5, initialHeight: 10, initialVelocity: 25, launchAngle: 45 },
+        piano:      { mass: 400, diameter: 1.5, initialHeight: 100, initialVelocity: 10, launchAngle: 10 },
+        car:        { mass: 1000, diameter: 2.5, initialHeight: 50, initialVelocity: 50, launchAngle: 30 },
+        human:      { mass: 70, diameter: 0.7, initialHeight: 5, initialVelocity: 20, launchAngle: 50 }
+    };
+
     // --- Physics Parameters ---
     let initialHeight = 10, initialVelocity = 25, launchAngle = 45;
     let gravity = 9.8, mass = 50, diameter = 0.5;
@@ -207,20 +215,62 @@ const projectileMotionSketch = (p) => {
         fireBtn.mousePressed(fireProjectile);
         resetBtn.mousePressed(resetSimulation);
 
-        const sliders = [
-            { el: initialHeightSlider, val: () => initialHeight = initialHeightSlider.value(), labelId: '#initial-height-value' },
-            { el: initialVelocitySlider, val: () => initialVelocity = initialVelocitySlider.value(), labelId: '#initial-velocity-value' },
-            { el: launchAngleSlider, val: () => launchAngle = launchAngleSlider.value(), labelId: '#launch-angle-value' },
-            { el: gravitySlider, val: () => gravity = gravitySlider.value(), labelId: '#proj-gravity-value' },
-            { el: massSlider, val: () => mass = massSlider.value(), labelId: '#proj-mass-value' },
-            { el: diameterSlider, val: () => diameter = diameterSlider.value(), labelId: '#proj-diameter-value' }
+        const controls = [
+            { slider: initialHeightSlider, input: p.select('#initial-height-input'), value: () => initialHeight = parseFloat(initialHeightSlider.value()), label: p.select('#initial-height-value') },
+            { slider: initialVelocitySlider, input: p.select('#initial-velocity-input'), value: () => initialVelocity = parseFloat(initialVelocitySlider.value()), label: p.select('#initial-velocity-value') },
+            { slider: launchAngleSlider, input: p.select('#launch-angle-input'), value: () => launchAngle = parseFloat(launchAngleSlider.value()), label: p.select('#launch-angle-value') },
+            { slider: gravitySlider, input: p.select('#proj-gravity-input'), value: () => gravity = parseFloat(gravitySlider.value()), label: p.select('#proj-gravity-value') },
+            { slider: massSlider, input: p.select('#proj-mass-input'), value: () => mass = parseFloat(massSlider.value()), label: p.select('#proj-mass-value') },
+            { slider: diameterSlider, input: p.select('#proj-diameter-input'), value: () => diameter = parseFloat(diameterSlider.value()), label: p.select('#proj-diameter-value') }
         ];
 
-        sliders.forEach(s => {
-            s.el.input(() => {
-                s.val();
-                p.select(s.labelId).html(s.el.value());
+        controls.forEach(c => {
+            c.slider.input(() => {
+                c.input.value(c.slider.value());
+                c.label.html(c.slider.value());
+                c.value();
             });
+
+            c.input.input(() => {
+                let val = parseFloat(c.input.value());
+                const min = parseFloat(c.slider.elt.min);
+                const max = parseFloat(c.slider.elt.max);
+                if (isNaN(val)) return;
+                val = p.constrain(val, min, max);
+                c.slider.value(val);
+                c.label.html(val);
+                c.value();
+            });
+        });
+
+        projectileSelect.changed(() => {
+            const projectileType = projectileSelect.value();
+            const data = PROJECTILES[projectileType];
+
+            // Update physics parameters
+            mass = data.mass;
+            diameter = data.diameter;
+            initialHeight = data.initialHeight;
+            initialVelocity = data.initialVelocity;
+            launchAngle = data.launchAngle;
+
+            // Update all controls
+            controls.forEach(c => {
+                let val;
+                if (c.slider === massSlider) val = mass;
+                else if (c.slider === diameterSlider) val = diameter;
+                else if (c.slider === initialHeightSlider) val = initialHeight;
+                else if (c.slider === initialVelocitySlider) val = initialVelocity;
+                else if (c.slider === launchAngleSlider) val = launchAngle;
+
+                if (val !== undefined) {
+                    c.slider.value(val);
+                    c.input.value(val);
+                    c.label.html(val);
+                }
+            });
+
+            resetSimulation();
         });
 
         airResistanceSwitch.changed(() => airResistanceOn = airResistanceSwitch.checked());

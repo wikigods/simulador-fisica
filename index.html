@@ -94,75 +94,89 @@
         <!-- Projectile Motion Simulator (Hidden by default) -->
         <div id="projectile-motion-container" class="sim-container" style="display: none;">
             <div class="row g-4">
-                <!-- Canvas Column -->
+                <!-- Canvas and Buttons Column -->
                 <div class="col-lg-8">
                     <div id="projectile-motion-canvas" class="bg-light border rounded" style="min-height: 600px;"></div>
+                    <!-- Action Buttons -->
+                    <div class="mt-3 d-flex justify-content-center gap-2">
+                        <button id="fire-btn" class="btn btn-danger btn-lg"><i class="fas fa-fire"></i> ¡Disparar!</button>
+                        <button id="reset-sim-btn" class="btn btn-secondary btn-lg"><i class="fas fa-undo"></i> Reiniciar</button>
+                    </div>
                 </div>
 
                 <!-- Control Panel Column -->
                 <div class="col-lg-4">
                     <div class="card shadow-sm">
                         <div class="card-body">
-                            <h5 class="card-title text-primary">Control Panel</h5>
+                            <h5 class="card-title text-primary"><i class="fas fa-cogs"></i> Panel de Control</h5>
                             <hr>
 
                             <!-- Initial Conditions -->
-                            <h6>Initial Conditions</h6>
+                            <h6><i class="fas fa-bullseye"></i> Condiciones Iniciales</h6>
                             <div class="mb-3">
-                                <label for="initial-height" class="form-label">Cannon Height: <span id="initial-height-value">10</span> m</label>
-                                <input type="range" class="form-range" id="initial-height" min="0" max="100" value="10">
+                                <label for="initial-height" class="form-label">Altura del Cañón: <span id="initial-height-value">10</span> m</label>
+                                <div class="input-group">
+                                    <input type="range" class="form-range" id="initial-height" min="0" max="100" value="10">
+                                    <input type="number" class="form-control form-control-sm" id="initial-height-input" min="0" max="100" value="10" step="1">
+                                </div>
                             </div>
                             <div class="mb-3">
-                                <label for="initial-velocity" class="form-label">Initial Speed: <span id="initial-velocity-value">25</span> m/s</label>
-                                <input type="range" class="form-range" id="initial-velocity" min="1" max="100" value="25">
+                                <label for="initial-velocity" class="form-label">Velocidad Inicial: <span id="initial-velocity-value">25</span> m/s</label>
+                                <div class="input-group">
+                                    <input type="range" class="form-range" id="initial-velocity" min="1" max="100" value="25">
+                                    <input type="number" class="form-control form-control-sm" id="initial-velocity-input" min="1" max="100" value="25" step="1">
+                                </div>
                             </div>
                             <div class="mb-3">
-                                <label for="launch-angle" class="form-label">Launch Angle: <span id="launch-angle-value">45</span>°</label>
-                                <input type="range" class="form-range" id="launch-angle" min="0" max="90" value="45">
+                                <label for="launch-angle" class="form-label">Ángulo de Lanzamiento: <span id="launch-angle-value">45</span>°</label>
+                                <div class="input-group">
+                                    <input type="range" class="form-range" id="launch-angle" min="0" max="90" value="45">
+                                    <input type="number" class="form-control form-control-sm" id="launch-angle-input" min="0" max="90" value="45" step="1">
+                                </div>
                             </div>
 
                             <hr>
 
                             <!-- Environmental Conditions -->
-                            <h6>Environment</h6>
+                            <h6>Entorno</h6>
                             <div class="mb-3">
-                                <label for="proj-gravity-slider" class="form-label">Gravity: <span id="proj-gravity-value">9.8</span> m/s²</label>
-                                <input type="range" class="form-range" min="1" max="25" value="9.8" step="0.1" id="proj-gravity-slider">
+                                <label for="proj-gravity-slider" class="form-label">Gravedad: <span id="proj-gravity-value">9.8</span> m/s²</label>
+                                <div class="input-group">
+                                    <input type="range" class="form-range" min="1" max="25" value="9.8" step="0.1" id="proj-gravity-slider">
+                                    <input type="number" class="form-control form-control-sm" id="proj-gravity-input" min="1" max="25" value="9.8" step="0.1">
+                                </div>
                             </div>
                             <div class="form-check form-switch mb-3">
                                 <input class="form-check-input" type="checkbox" role="switch" id="air-resistance-switch">
-                                <label class="form-check-label" for="air-resistance-switch">Air Resistance</label>
+                                <label class="form-check-label" for="air-resistance-switch">Resistencia del Aire</label>
                             </div>
 
                             <hr>
 
                             <!-- Projectile -->
-                            <h6>Projectile</h6>
+                            <h6>Proyectil</h6>
                             <div class="mb-3">
-                                <label for="projectile-select" class="form-label">Object Type</label>
+                                <label for="projectile-select" class="form-label">Tipo de Objeto</label>
                                 <select class="form-select" id="projectile-select">
-                                    <option value="cannonball" selected>Cannonball</option>
+                                    <option value="cannonball" selected>Bala de Cañón</option>
                                     <option value="piano">Piano</option>
-                                    <option value="car">Car</option>
-                                    <option value="human">Human</option>
+                                    <option value="car">Automóvil</option>
+                                    <option value="human">Humano</option>
                                 </select>
                             </div>
                             <div class="mb-3">
-                                <label for="proj-mass-slider" class="form-label">Mass: <span id="proj-mass-value">50</span> kg</label>
-                                <input type="range" class="form-range" min="1" max="200" value="50" id="proj-mass-slider">
+                                <label for="proj-mass-slider" class="form-label">Masa: <span id="proj-mass-value">50</span> kg</label>
+                                <div class="input-group">
+                                    <input type="range" class="form-range" min="1" max="1000" value="50" id="proj-mass-slider">
+                                    <input type="number" class="form-control form-control-sm" id="proj-mass-input" min="1" max="1000" value="50" step="1">
+                                </div>
                             </div>
                              <div class="mb-3">
-                                <label for="proj-diameter-slider" class="form-label">Diameter: <span id="proj-diameter-value">0.5</span> m</label>
-                                <input type="range" class="form-range" min="0.1" max="2" value="0.5" step="0.1" id="proj-diameter-slider">
-                            </div>
-
-
-                            <hr>
-
-                            <!-- Action Buttons -->
-                            <div class="d-grid gap-2">
-                                <button id="fire-btn" class="btn btn-primary"><i class="fas fa-bullseye"></i> Fire!</button>
-                                <button id="reset-sim-btn" class="btn btn-secondary"><i class="fas fa-undo"></i> Reset</button>
+                                <label for="proj-diameter-slider" class="form-label">Diámetro: <span id="proj-diameter-value">0.5</span> m</label>
+                                <div class="input-group">
+                                    <input type="range" class="form-range" min="0.1" max="5" value="0.5" step="0.1" id="proj-diameter-slider">
+                                    <input type="number" class="form-control form-control-sm" id="proj-diameter-input" min="0.1" max="5" value="0.5" step="0.1">
+                                </div>
                             </div>
                         </div>
                     </div>

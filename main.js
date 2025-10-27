@@ -1,6 +1,6 @@
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap';
-import './src/styles/main.scss'; // Import our new Sass file
+import '@fortawesome/fontawesome-free/css/all.min.css';
 import p5 from 'p5';
 import vectorLabSketch from './src/vector_lab.js';
 import skateParkSketch from './src/skate_park.js';

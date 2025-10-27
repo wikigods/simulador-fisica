@@ -1,6 +1,7 @@
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap';
 import '@fortawesome/fontawesome-free/css/all.min.css';
+import './src/styles/main.scss';
 import p5 from 'p5';
 import vectorLabSketch from './src/vector_lab.js';
 import skateParkSketch from './src/skate_park.js';

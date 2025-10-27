@@ -10,6 +10,7 @@
     "deploy": "gh-pages -d dist"
   },
   "devDependencies": {
+    "@playwright/test": "^1.56.1",
     "gh-pages": "^3.2.3",
     "sass": "^1.93.2",
     "vite": "^5.3.3"

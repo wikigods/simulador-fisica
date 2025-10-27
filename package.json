@@ -11,9 +11,11 @@
   },
   "devDependencies": {
     "gh-pages": "^3.2.3",
+    "sass": "^1.93.2",
     "vite": "^5.3.3"
   },
   "dependencies": {
+    "@fortawesome/fontawesome-free": "^7.1.0",
     "bootstrap": "^5.3.8",
     "p5": "^2.0.5"
   }

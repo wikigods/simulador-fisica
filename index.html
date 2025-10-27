@@ -93,41 +93,77 @@
 
         <!-- Projectile Motion Simulator (Hidden by default) -->
         <div id="projectile-motion-container" class="sim-container" style="display: none;">
-            <h2 class="mb-3">Projectile Motion Simulator</h2>
-            <div class="row">
-                <div class="col-md-9" id="projectile-motion-canvas"></div>
-                <div class="col-md-3">
-                    <div class="card">
+            <div class="row g-4">
+                <!-- Canvas Column -->
+                <div class="col-lg-8">
+                    <div id="projectile-motion-canvas" class="bg-light border rounded" style="min-height: 600px;"></div>
+                </div>
+
+                <!-- Control Panel Column -->
+                <div class="col-lg-4">
+                    <div class="card shadow-sm">
                         <div class="card-body">
-                            <h5 class="card-title">Controls</h5>
+                            <h5 class="card-title text-primary">Control Panel</h5>
+                            <hr>
+
+                            <!-- Initial Conditions -->
+                            <h6>Initial Conditions</h6>
                             <div class="mb-3">
-                                <label for="proj-gravity-slider" class="form-label">Gravity (g)</label>
+                                <label for="initial-height" class="form-label">Cannon Height: <span id="initial-height-value">10</span> m</label>
+                                <input type="range" class="form-range" id="initial-height" min="0" max="100" value="10">
+                            </div>
+                            <div class="mb-3">
+                                <label for="initial-velocity" class="form-label">Initial Speed: <span id="initial-velocity-value">25</span> m/s</label>
+                                <input type="range" class="form-range" id="initial-velocity" min="1" max="100" value="25">
+                            </div>
+                            <div class="mb-3">
+                                <label for="launch-angle" class="form-label">Launch Angle: <span id="launch-angle-value">45</span>°</label>
+                                <input type="range" class="form-range" id="launch-angle" min="0" max="90" value="45">
+                            </div>
+
+                            <hr>
+
+                            <!-- Environmental Conditions -->
+                            <h6>Environment</h6>
+                            <div class="mb-3">
+                                <label for="proj-gravity-slider" class="form-label">Gravity: <span id="proj-gravity-value">9.8</span> m/s²</label>
                                 <input type="range" class="form-range" min="1" max="25" value="9.8" step="0.1" id="proj-gravity-slider">
                             </div>
+                            <div class="form-check form-switch mb-3">
+                                <input class="form-check-input" type="checkbox" role="switch" id="air-resistance-switch">
+                                <label class="form-check-label" for="air-resistance-switch">Air Resistance</label>
+                            </div>
+
+                            <hr>
+
+                            <!-- Projectile -->
+                            <h6>Projectile</h6>
                             <div class="mb-3">
-                                <label for="proj-mass-slider" class="form-label">Mass (m)</label>
+                                <label for="projectile-select" class="form-label">Object Type</label>
+                                <select class="form-select" id="projectile-select">
+                                    <option value="cannonball" selected>Cannonball</option>
+                                    <option value="piano">Piano</option>
+                                    <option value="car">Car</option>
+                                    <option value="human">Human</option>
+                                </select>
+                            </div>
+                            <div class="mb-3">
+                                <label for="proj-mass-slider" class="form-label">Mass: <span id="proj-mass-value">50</span> kg</label>
                                 <input type="range" class="form-range" min="1" max="200" value="50" id="proj-mass-slider">
                             </div>
-                            <div class="mb-3">
-                                <label for="air-resistance-slider" class="form-label">Air Resistance (b)</label>
-                                <input type="range" class="form-range" min="0" max="1" value="0" step="0.01" id="air-resistance-slider">
+                             <div class="mb-3">
+                                <label for="proj-diameter-slider" class="form-label">Diameter: <span id="proj-diameter-value">0.5</span> m</label>
+                                <input type="range" class="form-range" min="0.1" max="2" value="0.5" step="0.1" id="proj-diameter-slider">
                             </div>
-                            <div class="form-check mb-2">
-                                <input class="form-check-input" type="checkbox" id="trace-path-checkbox" checked>
-                                <label class="form-check-label" for="trace-path-checkbox">Trace Path</label>
+
+
+                            <hr>
+
+                            <!-- Action Buttons -->
+                            <div class="d-grid gap-2">
+                                <button id="fire-btn" class="btn btn-primary"><i class="fas fa-bullseye"></i> Fire!</button>
+                                <button id="reset-sim-btn" class="btn btn-secondary"><i class="fas fa-undo"></i> Reset</button>
                             </div>
-                            <div class="form-check mb-3">
-                                <input class="form-check-input" type="checkbox" id="show-vectors-checkbox">
-                                <label class="form-check-label" for="show-vectors-checkbox">Show Vectors</label>
-                            </div>
-                            <button id="clear-traces-btn" class="btn btn-secondary">Clear Traces</button>
-                        </div>
-                    </div>
-                     <div class="card mt-3">
-                        <div class="card-body">
-                            <h5 class="card-title">Shot Data</h5>
-                            <p class="mb-1"><strong>Max Range (R):</strong> <span id="max-range-data">0</span> m</p>
-                            <p><strong>Max Height (H):</strong> <span id="max-height-data">0</span> m</p>
                         </div>
                     </div>
                 </div>

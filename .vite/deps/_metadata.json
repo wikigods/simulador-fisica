@@ -1,19 +1,19 @@
 {
-  "hash": "d959b4cb",
+  "hash": "1778734d",
   "configHash": "49acd256",
-  "lockfileHash": "040e6d17",
-  "browserHash": "9b6f43b2",
+  "lockfileHash": "776c8647",
+  "browserHash": "b809ba46",
   "optimized": {
     "bootstrap": {
       "src": "../../node_modules/bootstrap/dist/js/bootstrap.esm.js",
       "file": "bootstrap.js",
-      "fileHash": "e20244fb",
+      "fileHash": "539899e3",
       "needsInterop": false
     },
     "p5": {
       "src": "../../node_modules/p5/dist/app.js",
       "file": "p5.js",
-      "fileHash": "1f94aaf7",
+      "fileHash": "f6fb7a6f",
       "needsInterop": false
     }
   },

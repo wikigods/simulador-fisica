@@ -1,0 +1,55 @@
+// Import Font Awesome
+@import "@fortawesome/fontawesome-free/scss/fontawesome";
+@import "@fortawesome/fontawesome-free/scss/solid";
+
+// Variable overrides first
+$primary: #0d6efd;
+$secondary: #6c757d;
+$light: #f8f9fa;
+$dark: #212529;
+
+// Then import Bootstrap
+@import "bootstrap/scss/bootstrap";
+
+// Custom styles for the simulation hub
+body {
+    background-color: $light;
+}
+
+.sim-container {
+    h2 {
+        color: $primary;
+    }
+}
+
+// Projectile Motion Simulator Specific Styles
+#projectile-motion-container {
+    .card {
+        border: none;
+    }
+
+    .form-range::-webkit-slider-thumb {
+        background: $primary;
+    }
+
+    .form-range::-moz-range-thumb {
+        background: $primary;
+    }
+
+    .form-range::-ms-thumb {
+        background: $primary;
+    }
+
+    .btn-primary {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+    }
+     .btn-secondary {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+    }
+}

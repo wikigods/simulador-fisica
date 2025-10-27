@@ -154,55 +154,84 @@ const projectileMotionSketch = (p) => {
     }
 
     class TrajectoryMeter {
-        display(paths) {
-            let closestPoint = null;
-            let minDist = Infinity;
+        constructor(x, y) {
+            this.pos = p.createVector(x, y);
+            this.size = 20;
+            this.isDragging = false;
+            this.offsetX = 0;
+            this.offsetY = 0;
+        }
 
-            paths.forEach(path => {
-                path.forEach(pt => {
-                    const d = p.dist(p.mouseX, p.mouseY, pt.x, pt.y);
-                    if (d < minDist) {
-                        minDist = d;
-                        closestPoint = pt;
-                    }
-                });
-            });
-
-            if (minDist < 20 && closestPoint) {
-                this.drawTooltip(closestPoint);
+        handleDragging() {
+            if (this.isDragging) {
+                this.pos.x = p.mouseX + this.offsetX;
+                this.pos.y = p.mouseY + this.offsetY;
             }
+        }
+
+        display() {
+            this.handleDragging();
+            p.push();
+            p.stroke(0);
+            p.strokeWeight(2);
+            p.fill(255, 255, 0); // Yellow color like the example
+            p.ellipse(this.pos.x, this.pos.y, this.size, this.size);
+            p.line(this.pos.x - this.size / 2, this.pos.y, this.pos.x + this.size / 2, this.pos.y);
+            p.line(this.pos.x, this.pos.y - this.size / 2, this.pos.x, this.pos.y + this.size / 2);
+            p.pop();
         }
 
         drawTooltip(point) {
             const groundY = p.height - 40;
             const range = (point.x - cannon.pos.x) / pixelsPerMeter;
-            const height = (groundY - point.y) / pixelsPerMeter;
+            const height = Math.max(0, (groundY - point.y) / pixelsPerMeter);
 
-            const tooltipText = `Time: ${point.t.toFixed(2)}s\nRange: ${range.toFixed(2)}m\nHeight: ${height.toFixed(2)}m`;
+            const boxWidth = 150;
+            const boxHeight = 70;
+            const textPadding = 10;
 
             p.push();
-            p.translate(point.x, point.y);
-            p.fill(0, 0, 0, 180);
+            p.translate(this.pos.x, this.pos.y);
+            p.fill(30, 30, 50, 200); // Dark blueish background
             p.noStroke();
-            p.rect(10, -40, 150, 60, 5);
+            p.rect(15, -boxHeight / 2, boxWidth, boxHeight, 8);
+
             p.fill(255);
             p.textSize(14);
-            p.textAlign(p.LEFT, p.TOP);
-            p.text(tooltipText, 20, -30);
-            p.stroke(255, 255, 0);
-            p.strokeWeight(2);
-            p.point(0,0);
+            p.textAlign(p.LEFT, p.CENTER);
+
+            p.text(`Tiempo:`, 15 + textPadding, -boxHeight / 2 + textPadding * 2);
+            p.text(`Distancia:`, 15 + textPadding, -boxHeight / 2 + textPadding * 3.5);
+            p.text(`Altura:`, 15 + textPadding, -boxHeight / 2 + textPadding * 5);
+
+            p.textAlign(p.RIGHT, p.CENTER);
+            p.text(`${point.t.toFixed(2)} s`, 15 + boxWidth - textPadding, -boxHeight / 2 + textPadding * 2);
+            p.text(`${range.toFixed(2)} m`, 15 + boxWidth - textPadding, -boxHeight / 2 + textPadding * 3.5);
+            p.text(`${height.toFixed(2)} m`, 15 + boxWidth - textPadding, -boxHeight / 2 + textPadding * 5);
             p.pop();
         }
+    }
+
+    function calculateMaxHeight() {
+        const v0y = initialVelocity * p.sin(p.radians(launchAngle));
+        // Using the kinematic equation: v_f^2 = v_i^2 + 2*a*d
+        // At max height, v_f = 0. So, 0 = v0y^2 - 2*g*h_max
+        // h_max = v0y^2 / (2*g)
+        const h_max_above_cannon = (v0y ** 2) / (2 * gravity);
+        return initialHeight + h_max_above_cannon;
     }
 
     function updateScale() {
         const groundHeightPixels = 40;
         const availableHeight = p.height - groundHeightPixels;
-        const requiredMeters = initialHeight * 1.2;
-        const minVisibleMeters = 20;
+
+        const predictedMaxHeight = calculateMaxHeight();
+        const requiredMeters = Math.max(initialHeight, predictedMaxHeight) * 1.2; // 20% buffer
+        const minVisibleMeters = 20; // Ensure a minimum zoom level
+
         const visibleMeters = Math.max(requiredMeters, minVisibleMeters);
         pixelsPerMeter = availableHeight / visibleMeters;
+
         resetSimulation();
     }
 
@@ -237,7 +266,8 @@ const projectileMotionSketch = (p) => {
         controls.forEach(c => {
             const updateHandler = () => {
                 c.value();
-                if (c.slider === initialHeightSlider) {
+                // Update scale if any parameter affecting trajectory height changes
+                if (c.slider === initialHeightSlider || c.slider === initialVelocitySlider || c.slider === launchAngleSlider || c.slider === gravitySlider) {
                     updateScale();
                 }
             };
@@ -294,7 +324,7 @@ const projectileMotionSketch = (p) => {
 
         cannon = new Cannon();
         target = new Target(p.width * 0.75, p.height - 100, 50);
-        trajectoryMeter = new TrajectoryMeter();
+        trajectoryMeter = new TrajectoryMeter(p.width / 2, p.height / 2);
         updateScale(); // Initial setup call
     };
 
@@ -309,10 +339,31 @@ const projectileMotionSketch = (p) => {
         cannon.update(initialHeight, launchAngle);
         cannon.display();
         target.display();
+        trajectoryMeter.display();
 
         let allPaths = [...traces];
-        if (projectile) allPaths.push(projectile.path);
-        trajectoryMeter.display(allPaths);
+        if (projectile && projectile.path.length > 0) {
+            allPaths.push(projectile.path);
+        }
+
+        if (allPaths.length > 0) {
+            let closestPoint = null;
+            let minDist = Infinity;
+
+            allPaths.forEach(path => {
+                path.forEach(pt => {
+                    const d = p.dist(trajectoryMeter.pos.x, trajectoryMeter.pos.y, pt.x, pt.y);
+                    if (d < minDist) {
+                        minDist = d;
+                        closestPoint = pt;
+                    }
+                });
+            });
+
+            if (minDist < 30 && closestPoint) { // 30 pixel tolerance
+                trajectoryMeter.drawTooltip(closestPoint);
+            }
+        }
     };
 
     function drawBackground() {
@@ -344,11 +395,16 @@ const projectileMotionSketch = (p) => {
     p.mousePressed = () => {
         if (p.dist(p.mouseX, p.mouseY, target.pos.x, target.pos.y) < target.size / 2) {
             isDraggingTarget = true;
+        } else if (p.dist(p.mouseX, p.mouseY, trajectoryMeter.pos.x, trajectoryMeter.pos.y) < trajectoryMeter.size / 2) {
+            trajectoryMeter.isDragging = true;
+            trajectoryMeter.offsetX = trajectoryMeter.pos.x - p.mouseX;
+            trajectoryMeter.offsetY = trajectoryMeter.pos.y - p.mouseY;
         }
     };
 
     p.mouseReleased = () => {
         isDraggingTarget = false;
+        trajectoryMeter.isDragging = false;
     };
 
     p.windowResized = () => {

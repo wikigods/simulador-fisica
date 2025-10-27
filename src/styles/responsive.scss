@@ -1,0 +1,35 @@
+// src/styles/responsive.scss
+
+// Estilos para el lienzo de la simulación
+.projectile-canvas {
+  height: 75vh; // Altura inicial para pantallas grandes
+  min-height: 400px; // Altura mínima para asegurar visibilidad
+}
+
+// Media queries para ajustar el diseño en diferentes tamaños de pantalla
+
+// Tabletas (breakpoint de Bootstrap: 768px)
+@media (max-width: 768px) {
+  .projectile-canvas {
+    height: 60vh; // Reducir la altura en tabletas
+  }
+}
+
+// Móviles (breakpoint de Bootstrap: 576px)
+@media (max-width: 576px) {
+  .projectile-canvas {
+    height: 50vh; // Reducir aún más en móviles
+    min-height: 300px;
+  }
+
+  // Reducir el tamaño de los botones de acción en móviles
+  .btn-lg {
+    font-size: 1rem;
+    padding: 0.5rem 1rem;
+  }
+
+  // Reducir el tamaño del título del panel de control
+  .card-title {
+    font-size: 1.2rem;
+  }
+}

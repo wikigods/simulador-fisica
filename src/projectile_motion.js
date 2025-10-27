@@ -5,7 +5,7 @@ const projectileMotionSketch = (p) => {
     let cannon, projectile, target, trajectoryMeter;
     let traces = [];
     let time = 0;
-    const pixelsPerMeter = 10; // Scale: 10 pixels = 1 meter
+    let pixelsPerMeter = 10; // Scale: pixels per meter. This will be adjusted dynamically.
 
     // --- DOM Elements ---
     let initialHeightSlider, initialVelocitySlider, launchAngleSlider,
@@ -196,9 +196,19 @@ const projectileMotionSketch = (p) => {
         }
     }
 
+    function updateScale() {
+        const groundHeightPixels = 40;
+        const availableHeight = p.height - groundHeightPixels;
+        const requiredMeters = initialHeight * 1.2;
+        const minVisibleMeters = 20;
+        const visibleMeters = Math.max(requiredMeters, minVisibleMeters);
+        pixelsPerMeter = availableHeight / visibleMeters;
+        resetSimulation();
+    }
+
     p.setup = () => {
         const canvasContainer = document.getElementById('projectile-motion-canvas');
-        const canvas = p.createCanvas(canvasContainer.offsetWidth, 600);
+        const canvas = p.createCanvas(canvasContainer.offsetWidth, canvasContainer.offsetHeight);
         canvas.parent('projectile-motion-canvas');
 
         initialHeightSlider = p.select('#initial-height');
@@ -225,10 +235,17 @@ const projectileMotionSketch = (p) => {
         ];
 
         controls.forEach(c => {
+            const updateHandler = () => {
+                c.value();
+                if (c.slider === initialHeightSlider) {
+                    updateScale();
+                }
+            };
+
             c.slider.input(() => {
                 c.input.value(c.slider.value());
                 c.label.html(c.slider.value());
-                c.value();
+                updateHandler();
             });
 
             c.input.input(() => {
@@ -239,7 +256,7 @@ const projectileMotionSketch = (p) => {
                 val = p.constrain(val, min, max);
                 c.slider.value(val);
                 c.label.html(val);
-                c.value();
+                updateHandler();
             });
         });
 
@@ -270,7 +287,7 @@ const projectileMotionSketch = (p) => {
                 }
             });
 
-            resetSimulation();
+            updateScale();
         });
 
         airResistanceSwitch.changed(() => airResistanceOn = airResistanceSwitch.checked());
@@ -278,7 +295,7 @@ const projectileMotionSketch = (p) => {
         cannon = new Cannon();
         target = new Target(p.width * 0.75, p.height - 100, 50);
         trajectoryMeter = new TrajectoryMeter();
-        resetSimulation();
+        updateScale(); // Initial setup call
     };
 
     p.draw = () => {
@@ -332,6 +349,12 @@ const projectileMotionSketch = (p) => {
 
     p.mouseReleased = () => {
         isDraggingTarget = false;
+    };
+
+    p.windowResized = () => {
+        const canvasContainer = document.getElementById('projectile-motion-canvas');
+        p.resizeCanvas(canvasContainer.offsetWidth, canvasContainer.offsetHeight);
+        updateScale(); // Recalculate scale and positions based on new canvas size
     };
 };
 

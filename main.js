@@ -11,8 +11,11 @@ import projectileMotionSketch from './src/projectile_motion.js';
 let currentSketch = null;
 
 // --- DOM Elements ---
-const navLinks = document.querySelectorAll('.nav-link');
+const homeSection = document.getElementById('home-section');
+const simContent = document.getElementById('sim-content');
 const simContainers = document.querySelectorAll('.sim-container');
+const simCards = document.querySelectorAll('.sim-card');
+const backToHomeBtn = document.getElementById('back-to-home');
 
 // --- Functions ---
 
@@ -24,6 +27,7 @@ function loadSketch(simId) {
     // 1. Clean up the previous sketch if it exists
     if (currentSketch) {
         currentSketch.remove();
+        currentSketch = null;
     }
 
     // 2. Hide all containers and show the target one
@@ -39,40 +43,53 @@ function loadSketch(simId) {
     // 3. Load the new sketch
     switch (simId) {
         case 'vector-lab':
-            currentSketch = new p5(vectorLabSketch);
+            currentSketch = new p5(vectorLabSketch, document.getElementById('vector-lab-canvas'));
             break;
         case 'skate-park':
-            currentSketch = new p5(skateParkSketch);
+            currentSketch = new p5(skateParkSketch, document.getElementById('skate-park-canvas'));
             break;
         case 'projectile-motion':
-            currentSketch = new p5(projectileMotionSketch);
+            currentSketch = new p5(projectileMotionSketch, document.getElementById('projectile-motion-canvas'));
             break;
         default:
             console.error(`Unknown simId: ${simId}`);
     }
 }
 
+/**
+ * Shows the home screen and hides the simulation content.
+ */
+function showHomeScreen() {
+    homeSection.style.display = 'block';
+    simContent.style.display = 'none';
+    if (currentSketch) {
+        currentSketch.remove();
+        currentSketch = null;
+    }
+}
+
+/**
+ * Shows the simulation content and hides the home screen.
+ * @param {string} simId - The ID of the simulation to display.
+ */
+function showSimScreen(simId) {
+    homeSection.style.display = 'none';
+    simContent.style.display = 'block';
+    loadSketch(simId);
+}
 
 // --- Event Listeners ---
-navLinks.forEach(link => {
-    link.addEventListener('click', (e) => {
-        e.preventDefault();
-
-        // Deactivate all links
-        navLinks.forEach(l => l.classList.remove('active'));
-
-        // Activate the clicked link
-        const clickedLink = e.target;
-        clickedLink.classList.add('active');
-
-        // Load the corresponding sketch
-        const simId = clickedLink.getAttribute('data-sim');
-        loadSketch(simId);
+simCards.forEach(card => {
+    card.addEventListener('click', () => {
+        const simId = card.getAttribute('data-sim');
+        showSimScreen(simId);
     });
 });
 
+backToHomeBtn.addEventListener('click', showHomeScreen);
+
 // --- Initial Load ---
-// Load the default simulation (Vector Lab) when the page loads.
+// Show the home screen by default.
 window.addEventListener('DOMContentLoaded', () => {
-    loadSketch('vector-lab');
+    showHomeScreen();
 });

@@ -112,15 +112,6 @@ const projectileMotionSketch = (p) => {
             p.fill(20);
             p.noStroke();
             p.ellipse(this.pos.x, this.pos.y, this.radius * 2);
-
-            traces.forEach(trace => {
-                p.noFill();
-                p.stroke(0, 0, 255, 100);
-                p.strokeWeight(2);
-                p.beginShape();
-                trace.forEach(pt => p.vertex(pt.x, pt.y));
-                p.endShape();
-            });
         }
     }
 
@@ -375,37 +366,47 @@ const projectileMotionSketch = (p) => {
         updateScale(); // Initial setup call
     };
 
-    p.draw = () => {
-        drawBackground();
-
-        if (projectile) {
-            projectile.update(p.deltaTime / 1000);
-            projectile.display();
-        }
-
-        cannon.update(initialHeight, launchAngle);
-        cannon.display();
-        target.display();
-        trajectoryMeter.display();
-
+    function drawTraces() {
         let allPaths = [...traces];
         if (projectile && projectile.path.length > 0) {
             allPaths.push(projectile.path);
         }
 
-        if (allPaths.length > 0) {
-            let closestPoint = null;
-            let minDist = Infinity;
+        allPaths.forEach(path => {
+            p.noFill();
+            p.stroke(0, 0, 255, 100);
+            p.strokeWeight(2);
+            p.beginShape();
+            path.forEach(pt => p.vertex(pt.x, pt.y));
+            p.endShape();
+        });
+    }
 
-            allPaths.forEach(path => {
-                path.forEach(pt => {
-                    const d = p.dist(trajectoryMeter.pos.x, trajectoryMeter.pos.y, pt.x, pt.y);
-                    if (d < minDist) {
-                        minDist = d;
-                        closestPoint = pt;
-                    }
-                });
-            });
+    p.draw = () => {
+        drawBackground();
+
+        // Draw static objects and traces first.
+        drawTraces();
+        trajectoryMeter.display();
+        cannon.update(initialHeight, launchAngle);
+        cannon.display();
+        target.display();
+
+        // Update and draw the projectile on top.
+        if (projectile) {
+            projectile.update(p.deltaTime / 1000);
+            projectile.display();
+        }
+
+        // Draw the tooltip last so it's on top of everything.
+        const allPaths = projectile ? [...traces, projectile.path] : [...traces];
+        const allPoints = allPaths.flat();
+
+        if (allPoints.length > 0) {
+            const { point: closestPoint, dist: minDist } = allPoints.reduce((acc, pt) => {
+                const d = p.dist(trajectoryMeter.pos.x, trajectoryMeter.pos.y, pt.x, pt.y);
+                return d < acc.dist ? { point: pt, dist: d } : acc;
+            }, { point: null, dist: Infinity });
 
             if (minDist < 30 && closestPoint) { // 30 pixel tolerance
                 trajectoryMeter.drawTooltip(closestPoint);

@@ -101,9 +101,10 @@ const projectileMotionSketch = (p) => {
             time += dt;
             this.path.push({ t: time, x: this.pos.x, y: this.pos.y });
 
-            if (this.pos.y > p.height - this.radius || target.checkCollision(this.pos)) {
+            const roadSurfaceY = p.height - 10;
+            if (this.pos.y > roadSurfaceY - this.radius || target.checkCollision(this.pos)) {
                 this.inFlight = false;
-                if(this.pos.y > p.height - this.radius) this.pos.y = p.height - this.radius;
+                if (this.pos.y > roadSurfaceY - this.radius) this.pos.y = roadSurfaceY - this.radius;
             }
         }
 
@@ -150,6 +151,19 @@ const projectileMotionSketch = (p) => {
             p.ellipse(this.pos.x, this.pos.y, this.size * 0.6);
             p.fill(255, 0, 0);
             p.ellipse(this.pos.x, this.pos.y, this.size * 0.2);
+
+            // --- Display Distance ---
+            const distanceInMeters = (this.pos.x - cannon.pos.x) / pixelsPerMeter;
+            p.push();
+            p.fill(255);
+            p.stroke(0);
+            p.strokeWeight(1);
+            p.rect(this.pos.x - 40, this.pos.y + this.size / 2 + 5, 80, 25);
+            p.fill(0);
+            p.textSize(16);
+            p.textAlign(p.CENTER, p.CENTER);
+            p.text(`${distanceInMeters.toFixed(1)} m`, this.pos.x, this.pos.y + this.size / 2 + 18);
+            p.pop();
         }
     }
 
@@ -182,7 +196,7 @@ const projectileMotionSketch = (p) => {
         }
 
         drawTooltip(point) {
-            const groundY = p.height - 40;
+            const groundY = p.height - 10; // Adjusted for road surface
             const range = (point.x - cannon.pos.x) / pixelsPerMeter;
             const height = Math.max(0, (groundY - point.y) / pixelsPerMeter);
 
@@ -221,16 +235,49 @@ const projectileMotionSketch = (p) => {
         return initialHeight + h_max_above_cannon;
     }
 
+    function calculateFlightTimeAndRange() {
+        const v0y = initialVelocity * p.sin(p.radians(launchAngle));
+        const v0x = initialVelocity * p.cos(p.radians(launchAngle));
+
+        // Solve for t when y(t) = 0 using the quadratic formula: y = y0 + v0y*t - 0.5*g*t^2
+        const a = -0.5 * gravity;
+        const b = v0y;
+        const c = initialHeight;
+
+        const discriminant = b * b - 4 * a * c;
+        if (discriminant < 0) return { time: 0, range: 0 };
+
+        const t_flight = (-b - p.sqrt(discriminant)) / (2 * a);
+        const range = v0x * t_flight;
+
+        return { time: t_flight, range: range };
+    }
+
     function updateScale() {
-        const groundHeightPixels = 40;
+        const groundHeightPixels = 10; // Adjusted for road surface
+        const padding = 1.2; // 20% buffer
+
         const availableHeight = p.height - groundHeightPixels;
+        const availableWidth = p.width;
 
+        // Calculate trajectory metrics
         const predictedMaxHeight = calculateMaxHeight();
-        const requiredMeters = Math.max(initialHeight, predictedMaxHeight) * 1.2; // 20% buffer
-        const minVisibleMeters = 20; // Ensure a minimum zoom level
+        const { range: predictedRange } = calculateFlightTimeAndRange();
 
-        const visibleMeters = Math.max(requiredMeters, minVisibleMeters);
-        pixelsPerMeter = availableHeight / visibleMeters;
+        // Determine required world units to be visible
+        const requiredHeightMeters = Math.max(initialHeight, predictedMaxHeight);
+        const requiredWidthMeters = predictedRange;
+
+        // Ensure we don't zoom in too far
+        const minVisibleHeight = 20;
+        const minVisibleWidth = 20;
+
+        // Calculate scale based on height and width constraints
+        const ppmHeight = availableHeight / (Math.max(requiredHeightMeters, minVisibleHeight) * padding);
+        const ppmWidth = availableWidth / (Math.max(requiredWidthMeters, minVisibleWidth) * padding);
+
+        // Use the more restrictive scale (the smaller value) to ensure everything fits
+        pixelsPerMeter = Math.min(ppmHeight, ppmWidth);
 
         resetSimulation();
     }
@@ -323,7 +370,7 @@ const projectileMotionSketch = (p) => {
         airResistanceSwitch.changed(() => airResistanceOn = airResistanceSwitch.checked());
 
         cannon = new Cannon();
-        target = new Target(p.width * 0.75, p.height - 100, 50);
+        target = new Target(p.width * 0.75, p.height - 35, 50); // Adjusted for road
         trajectoryMeter = new TrajectoryMeter(p.width / 2, p.height / 2);
         updateScale(); // Initial setup call
     };
@@ -367,10 +414,32 @@ const projectileMotionSketch = (p) => {
     };
 
     function drawBackground() {
-        p.background(135, 206, 250);
-        p.fill(34, 139, 34);
+        p.background(135, 206, 250); // Sky blue
+
+        const groundAreaY = p.height - 40;
+        const roadHeight = 30;
+        const roadOffsetY = 5;
+        const roadSurfaceY = groundAreaY + roadOffsetY;
+
+        // Grass
+        p.fill(34, 139, 34); // Green
         p.noStroke();
-        p.rect(0, p.height - 40, p.width, 40);
+        p.rect(0, groundAreaY, p.width, 40);
+
+        // Road
+        p.fill(100); // Grey
+        p.rect(0, roadSurfaceY, p.width, roadHeight);
+
+        // Dashed line
+        p.stroke(255, 223, 0); // Yellow
+        p.strokeWeight(2);
+        const dashLength = 15;
+        const dashGap = 10;
+        const lineY = roadSurfaceY + roadHeight / 2;
+        for (let x = 0; x < p.width; x += dashLength + dashGap) {
+            p.line(x, lineY, x + dashLength, lineY);
+        }
+        p.noStroke(); // Reset stroke
     }
 
     function fireProjectile() {

@@ -22,6 +22,32 @@ body {
     }
 }
 
+// Card styles for simulation selection
+.sim-card {
+    cursor: pointer;
+    transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out, border-color 0.2s ease-in-out;
+    border: 1px solid #e9ecef;
+    border-radius: 0.5rem;
+
+    .card-body {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .fas {
+        color: $primary;
+        margin-bottom: 1rem;
+    }
+
+    &:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15) !important;
+        border-color: $primary;
+    }
+}
+
 // Projectile Motion Simulator Specific Styles
 #projectile-motion-container {
     .card {
